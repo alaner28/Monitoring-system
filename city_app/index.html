@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+	
+    <script>
+      var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') ||
+        CSS.supports('top: constant(a)'))
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
+        (coverSupport ? ', viewport-fit=cover' : '') + '" />')
+    </script>
+	<script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=Udc5Wc9ZWfXlKoikxaxRyb2k3KJI8faY"></script>
+    <title></title>
+	
+    <!--preload-links-->
+    <!--app-context-->
+<!-- 	<script type="importmap">
+	  {
+	    "imports": {
+	      "three": "https://cdn.jsdelivr.net/npm/three@v0.166.1/build/three.module.js",
+	      "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.166.1/examples/jsm/"
+	    }
+	  }
+	</script> -->
+	<!-- <script src="https://cdn.babylonjs.com/babylon.js"></script> -->
+	<!-- <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> -->
+	<!-- <script src="https://cdn.babylonjs.com/babylon.js"></script> -->
+	<!-- <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> -->
+
+	<!-- <script src="https://cdn.cnbabylon.com/loaders/babylonjs.loaders.js"></script> -->
+	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/babylonjs/7.14.0/babylon.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/materialsLibrary/babylonjs.materials.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/loaders/babylonjs.loaders.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/serializers/babylonjs.serializers.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/gui/babylon.gui.min.js"></script> -->
+	<!-- <script src="https://cdn.cnbabylon.com/inspector/babylon.inspector.bundle.js"></script> -->
+  </head>
+  <body>
+    <div id="app"><!--app-html--></div>
+	<!-- <div id="unity-container"> -->
+	    <!-- <iframe src="assets/UnityWebGL/index.html" style="width: 100%; height: 100%; border: none;"></iframe> -->
+	<!-- </div> -->
+	
+    <script type="module" src="/main.js"></script>
+	
+
+  </body>
+</html>

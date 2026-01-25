@@ -1,0 +1,21 @@
+{
+  "name": "hospitalwatcherapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babylonjs": "^7.14.0",
+    "babylonjs-loaders": "^7.14.0",
+    "echarts": "^5.4.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "three": "^0.166.1",
+    "uview-ui": "^2.0.37"
+  }
+}
