@@ -112,6 +112,7 @@ CREATE TABLE `user_info` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `phone` varchar(255),
   `role` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -123,8 +124,7 @@ CREATE TABLE `user_info` (
 
 LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-INSERT INTO `user_info` VALUES (1,'root','42f641872ae4070ed059696b1df93394',0),(2,'czczcz','221018ec8f51f30516412faa078583f3',0),(3,'czczcz','221018ec8f51f30516412faa078583f3',0),(4,'test','42f641872ae4070ed059696b1df93394',0);
-/*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
+INSERT INTO `user_info` VALUES (1,'root','42f641872ae4070ed059696b1df93394','',0),(2,'zbw','42f641872ae4070ed059696b1df93394','',1);
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

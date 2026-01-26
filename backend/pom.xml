@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.sipc</groupId>
-    <artifactId>Hospital_alarm_system</artifactId>
+    <artifactId>Monitoring_system</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Hospital_alarm_system</name>
-    <description>Hospital_alarm_system</description>
+    <name>Monitoring_system</name>
+    <description>Monitoring_system</description>
     <properties>
         <java.version>17</java.version>
     </properties>

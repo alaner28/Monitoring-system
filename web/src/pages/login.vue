@@ -53,10 +53,10 @@ export default {
     methods:{
         login(){
             const data = {
-                phone:this.username,
+                userName:this.username,
                 password:this.password
             }
-            this.$axios.post('http://8.152.219.117:10215/api/v1/user/login',data).then((res)=>{
+            this.$axios.post('http://localhost:10215/api/v1/user/login',data).then((res)=>{
                 console.log(res.data);
                 if(res.data.code === "A1000"){
                     this.$message(res.data.message)
