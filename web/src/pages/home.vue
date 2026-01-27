@@ -23,14 +23,13 @@
   </div>
 </template>
 
-<script>
-export default {
-    name:'home-1',
-    methods:{
-        goBack(){
-            this.$router.push('/visual')
-        }
-    }
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = (): void => {
+    router.push('/visual')
 }
 </script>
 

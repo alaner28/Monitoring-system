@@ -27,119 +27,88 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'weather-1',
-  data() {
-      return {
-          // 温度
-          temperature: 26,
-          //实时天气情况
-          weather:'晴',
-          // 预测三天的数据
-          day: [
-              {
-                  date: '2024-09-24',
-                  dayweather: '阴',
-                  daytemp: '25',
-                  nighttemp: '14'
-              },
-              {
-                  date: '2024-09-25',
-                  dayweather: '阴',
-                  daytemp: '25',
-                  nighttemp: '13'
-              },
-              {
-                  date: '2024-09-26',
-                  dayweather: '晴',
-                  daytemp: '24',
-                  nighttemp: '15'
-              }
-          ]
-      };
-  },
-  methods: {
-      getimg(state) {
-          // console.log(state);
-          if (state === '多云') {
-              return require('../../public/assets/weather/cloud.png');
-          } else if (state === '小雨') {
-              return require('../../public/assets/weather/smallrain.png');
-          }else if(state === '中雨'){
-            return require('../../public/assets/weather/midrain.png')
-          }else if(state === '大雨'){
-            return require('../../public/assets/weather/bigrain.png')
-          }else if(state === '阴'){
-            return require('../../public/assets/weather/overcastsky.png')
-          }else if(state === '暴雨'){
-            return require('../../public/assets/weather/rainstorm.png')
-          }else if(state === '雷阵雨'){
-            return require('../../public/assets/weather/thundershower.png')
-          }else{
-            //晴
-            return require('../../public/assets/weather/sun.png')
-          }
-      },
-      // 异步获取天气数据
-      fetchWeatherData() {
-        
-        let config = {
-        method: 'get',
-        url: '/api/data-visualization/v1/weather/future?adcode=120000',
-        headers: { 
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
-        }
-      };
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import axios from 'axios';
+import { useAlarmStore } from '@/stores/alarm';
+import { storeToRefs } from 'pinia';
 
-      // 使用箭头函数以保持 this 的上下文
-      this.$axios(config)
-        .then(response => {
-          const res = response.data;
-          if (res.code == '200') {
-              console.log('获取未来三天数据成功',res.data);
-              this.day = res.data
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+// 定义天气数据接口
+interface WeatherDay {
+  date: string;
+  dayweather: string;
+  daytemp: string;
+  nighttemp: string;
+}
 
-        config = {
-        method: 'get',
-        url: '/api/data-visualization/v1/weather/real-time?adcode=120000',
-        headers: { 
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
-        }
-      };
+interface RealWeatherData {
+  temperature: number;
+  weather: string;
+}
 
-      // 使用箭头函数以保持 this 的上下文
-      this.$axios(config)
-        .then(response => {
-          const res = response.data;
-          if(res.code == '200'){
-              // console.log('获取实时温度成功', res.data);
-              this.temperature = res.data.temperature
-              this.weather = res.data.weather
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+const alarmStore = useAlarmStore();
+const { getFutureWeather, getRealTimeWeather } = storeToRefs(alarmStore);
 
-      },
-      // 每秒获取一次天气数据
-      startFetching() {
-          setInterval(() => {
-              this.fetchWeatherData();
-          }, 60000); // 每60000ms（1分钟）请求一次数据
-      }
-  },
-  mounted() {
-      this.fetchWeatherData(); // 初始数据请求
-      this.startFetching(); // 开始定时获取数据
-  }
+// 温度
+const temperature = computed(() => getRealTimeWeather.value.temperature);
+// 实时天气情况
+const weather = computed(() => getRealTimeWeather.value.weather);
+// 预测三天的数据
+const day = computed(() => getFutureWeather.value);
+
+const getimg = (state: string): string => {
+    // console.log(state);
+    if (state === '多云') {
+        return require('../../public/assets/weather/cloud.png');
+    } else if (state === '小雨') {
+        return require('../../public/assets/weather/smallrain.png');
+    } else if(state === '中雨'){
+      return require('../../public/assets/weather/midrain.png')
+    } else if(state === '大雨'){
+      return require('../../public/assets/weather/bigrain.png')
+    } else if(state === '阴'){
+      return require('../../public/assets/weather/overcastsky.png')
+    } else if(state === '暴雨'){
+      return require('../../public/assets/weather/rainstorm.png')
+    } else if(state === '雷阵雨'){
+      return require('../../public/assets/weather/thundershower.png')
+    } else {
+      //晴
+      return require('../../public/assets/weather/sun.png')
+    }
 };
+
+// 从Pinia获取天气数据
+const fetchWeatherData = (): void => {
+  // 直接从Pinia获取数据，不需要API调用
+  // 数据已经通过其他地方存储在store中
+};
+
+let intervalId: number | null = null;
+
+// 每分钟获取一次天气数据
+const startFetching = (): void => {
+    intervalId = window.setInterval(() => {
+        fetchWeatherData();
+    }, 60000); // 每60000ms（1分钟）请求一次数据
+};
+
+onMounted(() => {
+    fetchWeatherData(); // 从Pinia获取数据
+    startFetching(); // 开始定时获取数据
+    
+    // 监听天气数据变化
+    watch([getFutureWeather, getRealTimeWeather], ([newFuture, newReal]) => {
+        // 数据变化时自动更新，由于使用了computed，视图会自动响应
+    }, { deep: true });
+});
+
+// 清理定时器
+onUnmounted(() => {
+    if(intervalId) {
+        clearInterval(intervalId);
+    }
+});
 </script>
 
 <style scoped>

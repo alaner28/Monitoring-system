@@ -14,65 +14,71 @@ import java.util.List;
 
 /**
  * @author CZCZCZ
- * &#064;date 2023-09-11 19:29
+ *         &#064;date 2023-09-11 19:29
  */
 @Mapper
 public interface AlarmDao extends BaseMapper<Alarm> {
 
-//    @Select("<script>" +
-//            "SELECT monitor.area,\n" +
-//            "    case_type_info.case_type_name,\n" +
-//            "    alarm_info.id,\n" +
-//            "    alarm_info.clip_link,\n" +
-//            "    alarm_info.warning_level,\n" +
-//            "    alarm_info.create_time,\n" +
-//            "    alarm_info.`status`,\n" +
-//            "    alarm_info.processing_content,\n" +
-//            "    monitor.`name` FROM alarm_info\n" +
-//            "    INNER JOIN monitor ON alarm_info.monitor_id = monitor.id \n" +
-//            "    INNER JOIN case_type_info ON alarm_info.case_type = case_type_info.id " +
-//            "WHERE 1=1 " +
-//            "<if test='caseType != null'>AND CASE_TYPE = #{caseType}</if>" +
-//            "<if test='status != null'>AND STATUS = #{status}</if>" +
-//            "<if test='warningLevel != null'>AND WARNING_LEVEL = #{warningLevel}</if>" +
-//            "<if test='time1 != null and time2 != null'>AND CREATE_TIME BETWEEN #{time1} AND #{time2}</if>" +
-//            "<if test='time1 != null and time2 == null'>AND CREATE_TIME >= #{time1}</if>" +
-//            "<if test='time1 == null and time2 != null'>AND CREATE_TIME &lt;= #{time2}</if>" +
-//            "ORDER BY alarm_info.warning_level DESC, alarm_info.create_time DESC, alarm_info.id DESC\n" +  // Here is the sorting clause
-//            "LIMIT #{pageOffset}, #{pageSize}" +
-//            "</script>")
-@Select("<script>" +
-        "SELECT monitor.area,\n" +
-        "    case_type_info.case_type_name,\n" +
-        "    alarm_info.id,\n" +
-        "    alarm_info.clip_link,\n" +
-        "    alarm_info.warning_level,\n" +
-        "    alarm_info.create_time,\n" +
-        "    alarm_info.`status`,\n" +
-        "    alarm_info.processing_content,\n" +
-        "    monitor.`name`,\n" +
-        "    user_info.phone AS phone FROM alarm_info\n" + // Added leader's phone
-        "    INNER JOIN monitor ON alarm_info.monitor_id = monitor.id \n" +
-        "    INNER JOIN case_type_info ON alarm_info.case_type = case_type_info.id \n" +
-        "    INNER JOIN user_info ON monitor.leader = user_info.user_name " + // Join user_info to get the phone based on the leader id
-        "WHERE 1=1 " +
-        "<if test='caseType != null'>AND CASE_TYPE = #{caseType}</if>" +
-        "<if test='status != null'>AND STATUS = #{status}</if>" +
-        "<if test='warningLevel != null'>AND WARNING_LEVEL = #{warningLevel}</if>" +
-        "<if test='time1 != null and time2 != null'>AND CREATE_TIME BETWEEN #{time1} AND #{time2}</if>" +
-        "<if test='time1 != null and time2 == null'>AND CREATE_TIME >= #{time1}</if>" +
-        "<if test='time1 == null and time2 != null'>AND CREATE_TIME &lt;= #{time2}</if>" +
-        "ORDER BY alarm_info.warning_level DESC, alarm_info.create_time DESC, alarm_info.id DESC\n" +  // Here is the sorting clause
-        "LIMIT #{pageOffset}, #{pageSize}" +
-        "</script>")
+    // @Select("<script>" +
+    // "SELECT monitor.area,\n" +
+    // " case_type_info.case_type_name,\n" +
+    // " alarm_info.id,\n" +
+    // " alarm_info.clip_link,\n" +
+    // " alarm_info.warning_level,\n" +
+    // " alarm_info.create_time,\n" +
+    // " alarm_info.`status`,\n" +
+    // " alarm_info.processing_content,\n" +
+    // " monitor.`name` FROM alarm_info\n" +
+    // " INNER JOIN monitor ON alarm_info.monitor_id = monitor.id \n" +
+    // " INNER JOIN case_type_info ON alarm_info.case_type = case_type_info.id " +
+    // "WHERE 1=1 " +
+    // "<if test='caseType != null'>AND CASE_TYPE = #{caseType}</if>" +
+    // "<if test='status != null'>AND STATUS = #{status}</if>" +
+    // "<if test='warningLevel != null'>AND WARNING_LEVEL = #{warningLevel}</if>" +
+    // "<if test='time1 != null and time2 != null'>AND CREATE_TIME BETWEEN #{time1}
+    // AND #{time2}</if>" +
+    // "<if test='time1 != null and time2 == null'>AND CREATE_TIME >= #{time1}</if>"
+    // +
+    // "<if test='time1 == null and time2 != null'>AND CREATE_TIME &lt;=
+    // #{time2}</if>" +
+    // "ORDER BY alarm_info.warning_level DESC, alarm_info.create_time DESC,
+    // alarm_info.id DESC\n" + // Here is the sorting clause
+    // "LIMIT #{pageOffset}, #{pageSize}" +
+    // "</script>")
+    @Select("<script>" +
+            "SELECT monitor.area,\n" +
+            "    case_type_info.case_type_name,\n" +
+            "    alarm_info.id,\n" +
+            "    alarm_info.clip_link,\n" +
+            "    alarm_info.warning_level,\n" +
+            "    alarm_info.create_time,\n" +
+            "    alarm_info.`status`,\n" +
+            "    alarm_info.processing_content,\n" +
+            "    monitor.`name`,\n" +
+            "    user_info.phone AS phone FROM alarm_info\n" + // Added leader's phone
+            "    INNER JOIN monitor ON alarm_info.monitor_id = monitor.id \n" +
+            "    INNER JOIN case_type_info ON alarm_info.case_type = case_type_info.id \n" +
+            "    INNER JOIN user_info ON monitor.leader = user_info.user_name " + // Join user_info to get the phone
+                                                                                  // based on the leader id
+            "WHERE 1=1 " +
+            "<if test='caseType != null'>AND CASE_TYPE = #{caseType}</if>" +
+            "<if test='status != null'>AND STATUS = #{status}</if>" +
+            "<if test='warningLevel != null'>AND WARNING_LEVEL = #{warningLevel}</if>" +
+            "<if test='time1 != null and time2 != null'>AND CREATE_TIME BETWEEN #{time1} AND #{time2}</if>" +
+            "<if test='time1 != null and time2 == null'>AND CREATE_TIME >= #{time1}</if>" +
+            "<if test='time1 == null and time2 != null'>AND CREATE_TIME &lt;= #{time2}</if>" +
+            "ORDER BY alarm_info.warning_level DESC, alarm_info.create_time DESC, alarm_info.id DESC\n" + // Here is the
+                                                                                                          // sorting
+                                                                                                          // clause
+            "LIMIT #{pageOffset}, #{pageSize}" +
+            "</script>")
     List<SqlGetAlarm> selectByCondition(@Param("pageOffset") Integer pageOffset,
-                                        @Param("pageSize") Integer pageSize,
-                                        @Param("caseType") String caseType,
-                                        @Param("status") String status,
-                                        @Param("warningLevel") String warningLevel,
-                                        @Param("time1") String time1,
-                                        @Param("time2") String time2);
-
+            @Param("pageSize") Integer pageSize,
+            @Param("caseType") String caseType,
+            @Param("status") String status,
+            @Param("warningLevel") String warningLevel,
+            @Param("time1") String time1,
+            @Param("time2") String time2);
 
     @Select("""
             SELECT
@@ -159,52 +165,65 @@ public interface AlarmDao extends BaseMapper<Alarm> {
     List<TimePeriod> SqlGetAreasDayHistoryCnt(@Param("date") String date);
 
     @Select("""
-    SELECT
-        m.area AS period,
-        COUNT(a.monitor_id) AS cnt
-    FROM monitor m
-    LEFT JOIN alarm_info a ON m.id = a.monitor_id AND DATE(a.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 2 DAY) AND #{date}
-    GROUP BY m.area""")
+            SELECT
+                m.area AS period,
+                COUNT(a.monitor_id) AS cnt
+            FROM monitor m
+            LEFT JOIN alarm_info a ON m.id = a.monitor_id AND DATE(a.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 2 DAY) AND #{date}
+            GROUP BY m.area""")
     List<TimePeriod> SqlGetAreasThreeDaysHistoryCnt(@Param("date") String date);
 
-
-
     @Select("""
-    SELECT
-        m.area AS period,
-        COUNT(a.monitor_id) AS cnt
-    FROM monitor m
-    LEFT JOIN alarm_info a ON m.id = a.monitor_id AND DATE(a.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 6 DAY) AND #{date}
-    GROUP BY m.area""")
+            SELECT
+                m.area AS period,
+                COUNT(a.monitor_id) AS cnt
+            FROM monitor m
+            LEFT JOIN alarm_info a ON m.id = a.monitor_id AND DATE(a.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 6 DAY) AND #{date}
+            GROUP BY m.area""")
     List<TimePeriod> SqlGetAreasWeekHistoryCnt(@Param("date") String date);
 
-
     @Select("""
-    SELECT
-        case_type_info.case_type_name as period,
-        COUNT(alarm_info.case_type) AS cnt
-    FROM case_type_info
-    LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) = #{date}
-    GROUP BY case_type_info.case_type_name""")
+            SELECT
+                case_type_info.case_type_name as period,
+                COUNT(alarm_info.case_type) AS cnt
+            FROM case_type_info
+            LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) = #{date}
+            GROUP BY case_type_info.case_type_name""")
     List<TimePeriod> SqlGetCaseTypesDayHistoryCnt(@Param("date") String date);
 
     @Select("""
-    SELECT
-        case_type_info.case_type_name as period,
-        COUNT(alarm_info.case_type) AS cnt
-    FROM case_type_info
-    LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 2 DAY) AND #{date}
-    GROUP BY case_type_info.case_type_name""")
+            SELECT
+                case_type_info.case_type_name as period,
+                COUNT(alarm_info.case_type) AS cnt
+            FROM case_type_info
+            LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 2 DAY) AND #{date}
+            GROUP BY case_type_info.case_type_name""")
     List<TimePeriod> SqlGetCaseTypesThreeDaysHistoryCnt(@Param("date") String date);
 
-
     @Select("""
-    SELECT
-        case_type_info.case_type_name as period,
-        COUNT(alarm_info.case_type) AS cnt
-    FROM case_type_info
-    LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 6 DAY) AND #{date}
-    GROUP BY case_type_info.case_type_name""")
+            SELECT
+                case_type_info.case_type_name as period,
+                COUNT(alarm_info.case_type) AS cnt
+            FROM case_type_info
+            LEFT JOIN alarm_info ON case_type_info.id = alarm_info.case_type AND DATE(alarm_info.create_time) BETWEEN DATE_SUB(#{date}, INTERVAL 6 DAY) AND #{date}
+            GROUP BY case_type_info.case_type_name""")
     List<TimePeriod> SqlGetCaseTypesWeekHistoryCnt(@Param("date") String date);
+
+    // 特别标注：selectAllTest方法，用于测试获取所有报警记录
+    @Select("SELECT monitor.area,\n" +
+            "    case_type_info.case_type_name,\n" +
+            "    alarm_info.id,\n" +
+            "    alarm_info.clip_link,\n" +
+            "    alarm_info.warning_level,\n" +
+            "    alarm_info.create_time,\n" +
+            "    alarm_info.`status`,\n" +
+            "    alarm_info.processing_content,\n" +
+            "    monitor.`name`,\n" +
+            "    user_info.phone AS phone FROM alarm_info\n" +
+            "    INNER JOIN monitor ON alarm_info.monitor_id = monitor.id \n" +
+            "    INNER JOIN case_type_info ON alarm_info.case_type = case_type_info.id \n" +
+            "    INNER JOIN user_info ON monitor.leader = user_info.user_name " +
+            "ORDER BY alarm_info.warning_level DESC, alarm_info.create_time DESC, alarm_info.id DESC")
+    List<SqlGetAlarm> selectAllTest();
 
 }

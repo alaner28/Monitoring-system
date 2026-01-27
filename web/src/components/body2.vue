@@ -16,101 +16,62 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import map1 from './map1.vue';
-    export default {
-        name:'body-2',
-        components:{
-            map1
-        },
-        data() {
-          return {
-            lastmonth:235,
-            lastyear:1328
-          }
-        },
-        mounted(){
-          this.updateCount();
-          this.$bus.$on('alarm',()=>{
-            console.log('body2接收到报警信息，准备更新');
-            
-            this.updateCount();
-          })
-        },
-        beforeDestroy(){
-            this.$bus.$off('alarm')
-        },
-        methods:{
-          updateCount(){
+import axios from 'axios';
+import { useAlarmStore } from '@/stores/alarm';
+import { storeToRefs } from 'pinia';
 
-            let config = {
-              method: 'get',
-              url: '/api/data-visualization/v1/statistics/thirty-days',
-              headers: { 
-                  'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
-              }
-            };
+const alarmStore = useAlarmStore();
+const { getMonthStatistics, getYearStatistics } = storeToRefs(alarmStore);
 
-            // 使用箭头函数以保持 this 的上下文
-            this.$axios(config)
-              .then(response => {
+const lastmonth = computed(() => {
+  let cnt = 0;
+  for(const item in getMonthStatistics.value) {
+    cnt += getMonthStatistics.value[item].eventCount;
+  }
+  return cnt;
+});
 
-                // console.log(result)
-                const res = response.data;
-                  if(res.code == '200'){
-                    console.log('获取近30天信息成功',res.data);
-                    let data = res.data
-                    let cnt = 0;
-                    for(let item in data){
-                      
-                      cnt += data[item].eventCount;
-                    }
-                    this.lastmonth = cnt
-                    // console.log(cnt);
-                    
-                    
-                  }
-              })
-              .catch(error => {
-                console.log(error);
-              });
+const lastyear = computed(() => {
+  let cnt = 0;
+  for(const item in getYearStatistics.value) {
+    cnt += getYearStatistics.value[item].eventCount;
+  }
+  return cnt;
+});
 
+// 处理事件总线的回调函数
+let alarmHandler: (() => void) | null = null;
 
-              config = {
-                method: 'get',
-                url: '/api/data-visualization/v1/statistics/year',
-                headers: { 
-                    'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
-                }
-              };
+// 更新计数
+const updateCount = (): void => {
+  // 从Pinia获取数据，不需要API调用
+  // 数据已经在store中，通过computed自动更新
+};
 
-            // 使用箭头函数以保持 this 的上下文
-            this.$axios(config)
-              .then(response => {
+onMounted(() => {
+  updateCount();
+  
+  // 获取事件总线实例
+  const bus = (window as any).$bus;
+  if(bus) {
+    alarmHandler = () => {
+      console.log('body2接收到报警信息，准备更新');
+      updateCount();
+    };
+    bus.$on('alarm', alarmHandler);
+  }
+});
 
-                // console.log(result)
-                const res = response.data;
-                if(res.code == '200'){
-                    console.log('获取近一年信息成功',res.data);
-                    let data = res.data
-                    let cnt = 0;
-                    for(let item in data){
-                      // console.log(('item',item));
-                      
-                      cnt += data[item].eventCount;
-                    }
-                    this.lastyear = cnt
-                    // console.log(cnt);
-                    
-                    
-                  }
-              })
-              .catch(error => {
-                console.log(error);
-              });
-          }
-        }
-    }
+onUnmounted(() => {
+  // 移除事件监听
+  const bus = (window as any).$bus;
+  if(bus && alarmHandler) {
+    bus.$off('alarm', alarmHandler);
+  }
+});
 </script>
 
 <style>

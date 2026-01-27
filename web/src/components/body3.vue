@@ -6,20 +6,11 @@
     </div>
   </template>
   
-  <script>
+  <script setup lang="ts">
   import monitor from './monitor.vue';
   import people from './people.vue';
   import weather from './weather.vue';
-
-      export default {
-          name:'body-3',
-          components:{
-              monitor,
-              people,
-              weather
-          }
-      }
-  </script>
+</script>
   
   <style scoped>
       .body3 {

@@ -1,9 +1,11 @@
-package com.sipc.monitoringsystem.controller;
+/*写的是啥玩意 ？？？？？？*/
 
-import com.alibaba.excel.EasyExcel;
-import com.fasterxml.jackson.core.JsonProcessingException;
+/*package com.sipc.monitoringsystem.controller;
+
+import com.alibaba.excel.EasyExcel;ception;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sipc.monitoringsystem.aop.ClearRedis;
+import com.sipc.monitoringsystem.aop.Cl
+import com.fasterxml.jackson.core.JsonProcessingExearRedis;
 import com.sipc.monitoringsystem.aop.Pass;
 import com.sipc.monitoringsystem.model.dto.CommonResult;
 import com.sipc.monitoringsystem.model.dto.param.alarm.UpdateAlarmParam;
@@ -32,14 +34,6 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/alarm")
-
-/* 
-TODO 
-报警记录假设有10000条才占4MB，不至于使用数据库分页查询
-而且实时性不高，这个报警推送采用的应该是前端轮询的方式，
-应该使用websocket的publish/subscribe模式
-这里除了receive之外全改
-*/
 public class AlarmController {
 
     @Autowired
@@ -198,4 +192,4 @@ public class AlarmController {
         return ResponseEntity.ok().body(bytes);
         }
 
-}
+}*/

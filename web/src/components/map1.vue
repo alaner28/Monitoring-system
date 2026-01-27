@@ -7,130 +7,146 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
 import * as echarts from 'echarts'
-import {mapData} from '../china'
-export default {
-    name:'map-1',
-    mounted(){
-      
-      // console.log('mapdata',mapData);
-      
-        // 1. 实例化对象
-        let myChart = echarts.init(this.$refs.map);
-        echarts.registerMap('chinaMap',mapData)
+import { mapData } from '../china'
 
-        
-        let option = {
-          tooltip: {
-            trigger: "item",
-            formatter: function(params, /*ticket, callback*/) {
-              if (params.seriesType == "effectScatter") {
-                console.log(2);
-                
-                return "线路：" + params.data.name + "" + params.data.value[2];
-              } else if (params.seriesType == "lines") {
-                console.log(1);
-                
-                return (
-                  params.data.fromName +
-                  ">" +
-                  params.data.toName +
-                  "<br />" +
-                  params.data.value
-                );
-              } else {
-                // console.log(params);
-                console.log(3);
-                
-                return params.name;
+const map = ref<HTMLDivElement>();
+
+let myChart: any = null;
+
+onMounted(() => {
+  if(map.value) {
+    // 1. 实例化对象
+    myChart = echarts.init(map.value);
+    echarts.registerMap('chinaMap', mapData)
+
+    
+    const option = {
+      tooltip: {
+        trigger: "item",
+        formatter: function(params: any, /*ticket, callback*/) {
+          if (params.seriesType == "effectScatter") {
+            console.log(2);
+            
+            return "线路：" + params.data.name + "" + params.data.value[2];
+          } else if (params.seriesType == "lines") {
+            console.log(1);
+            
+            return (
+              params.data.fromName +
+              ">" +
+              params.data.toName +
+              "<br />" +
+              params.data.value
+            );
+          } else {
+            // console.log(params);
+            console.log(3);
+            
+            return params.name;
+          }
+        }
+      },
+
+        geo: {
+          type:'map',
+
+          map: 'chinaMap',
+          label: {
+              emphasis: {
+              show: true,
+              color: "#fff"
               }
-            }
           },
-
-            geo: {
-              type:'map',
-
-              map: 'chinaMap',
-              label: {
-                  emphasis: {
-                  show: true,
-                  color: "#fff"
-                  }
+          //平移
+          roam: true,
+          //   放大我们的地图
+          zoom: 1.1,
+          itemStyle: {
+              normal: {
+              areaColor: "rgba(43, 196, 243, 0.42)",
+              borderColor: "rgba(43, 196, 243, 1)",
+              borderWidth: 1
               },
-              //平移
-              roam: true,
-              //   放大我们的地图
-              zoom: 1.1,
-              itemStyle: {
-                  normal: {
-                  areaColor: "rgba(43, 196, 243, 0.42)",
-                  borderColor: "rgba(43, 196, 243, 1)",
-                  borderWidth: 1
-                  },
-                  emphasis: {
-                  areaColor: "#2B91B7"
-                  }
+              emphasis: {
+              areaColor: "#2B91B7"
               }
-            },
-            series:[
+          }
+        },
+        series:[
+          {
+            // 设置涟漪效果的散点图
+            type:'effectScatter',
+            coordinateSystem:'geo',
+            data:[
               {
-                // 设置涟漪效果的散点图
-                type:'effectScatter',
-                coordinateSystem:'geo',
-                data:[
-                  {
-                    name:'西安市',
-                    value:[
-                        108.95,
-                        34.26
-                    ]
-                  },
-                  {
-                    name:'北京市',
-                    value:[
-                        116.407431,
-                        39.91405
-                    ]
-                  },
-                  {
-                    name:'上海市',
-                    value:[
-                      121.475366,
-                      31.235929
-                    ]
-                  },
-                  {
-                    name:'广州市',
-                    value:[
-                      113.270279,
-                      23.134804
-                    ]
-                  }
-                ],
-                // 设置涟漪效果
-                rippleEffect:{
-                  number:3,//波纹数量
-                  scale:2.9,//波纹大小
-                },
-                itemStyle:{
-                  color:'white'
-                },
-                label:{
-                  show:true,
-                  position:'bottom',
-                  formatter:'{b}',
-                  color:'white'
-                }
+                name:'西安市',
+                value:[
+                    108.95,
+                    34.26
+                ]
+              },
+              {
+                name:'北京市',
+                value:[
+                    116.407431,
+                    39.91405
+                ]
+              },
+              {
+                name:'上海市',
+                value:[
+                  121.475366,
+                  31.235929
+                ]
+              },
+              {
+                name:'广州市',
+                value:[
+                  113.270279,
+                  23.134804
+                ]
               }
-            ]
-        };
-        myChart.setOption(option);
-        window.addEventListener("resize", function() {
-            myChart.resize();
-        });
+            ],
+            // 设置涟漪效果
+            rippleEffect:{
+              number:3,//波纹数量
+              scale:2.9,//波纹大小
+            },
+            itemStyle:{
+              color:'white'
+            },
+            label:{
+              show:true,
+              position:'bottom',
+              formatter:'{b}',
+              color:'white'
+            }
+          }
+        ]
+    };
+    myChart.setOption(option);
+    window.addEventListener("resize", function() {
+        myChart.resize();
+    });
+  }
+});
+
+onUnmounted(() => {
+  // 销毁图表实例
+  if(myChart) {
+    myChart.dispose();
+  }
+  
+  // 移除窗口大小调整的监听事件
+  window.removeEventListener("resize", function() {
+    if(myChart) {
+      myChart.resize();
     }
-}
+  });
+});
 </script>
 
 <style scoped>

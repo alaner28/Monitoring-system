@@ -9,48 +9,53 @@
     </div>
   </template>
   
-  <script>
-  export default {
-      name:'header-1',
-      data() {
-          return {
-              nowtime: ''
-          }
-      },
-      methods: {
-          updateTime() {
-              const dt = new Date();
-              const y = dt.getFullYear();
-              const mt = dt.getMonth() + 1;
-              const day = dt.getDate();
-              const h = dt.getHours(); //获取时
-              const m = dt.getMinutes(); //获取分
-              const s = dt.getSeconds(); //获取秒
+  <script setup lang="ts">
+  import { ref, onMounted, onUnmounted } from 'vue'
+  import { useRouter } from 'vue-router'
   
-              this.nowtime =
-                  "当前时间：" +
-                  y +
-                  "年" +
-                  mt +
-                  "月" +
-                  day + "日"+
-                  "-" +
-                  h +
-                  "时" +
-                  m +
-                  "分" +
-                  s +
-                  "秒";
-          },
-          goHome(){
-            this.$router.push('/home')
-          }
-      },
-      mounted() {
-          this.updateTime(); // 初始化时间显示
-          setInterval(this.updateTime, 1000); // 每秒更新时间
-      }
+  const nowtime = ref<string>('')
+  const router = useRouter()
+  let timer: ReturnType<typeof setInterval> | null = null // 定时器
+  
+  const updateTime = (): void => {
+      const dt = new Date();
+      const y = dt.getFullYear();
+      const mt = dt.getMonth() + 1;
+      const day = dt.getDate();
+      const h = dt.getHours(); //获取时
+      const m = dt.getMinutes(); //获取分
+      const s = dt.getSeconds(); //获取秒
+
+      nowtime.value =
+          "当前时间：" +
+          y +
+          "年" +
+          mt +
+          "月" +
+          day + "日"+
+          "-" +
+          h +
+          "时" +
+          m +
+          "分" +
+          s +
+          "秒";
   }
+  
+  const goHome = (): void => {
+    router.push('/home')
+  }
+  
+  onMounted(() => {
+      updateTime(); // 初始化时间显示
+      timer = setInterval(updateTime, 1000); // 每秒更新时间
+  })
+  
+  onUnmounted(() => {
+      if (timer) {
+          clearInterval(timer)
+      }
+  })
   </script>
   
   <style scoped>

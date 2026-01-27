@@ -39,44 +39,44 @@
   
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 
-export default {
-    name:'login-1',
-    data() {
-        return {
-            username:'',
-            password:''
-            
-        }
-    },
-    methods:{
-        login(){
-            const data = {
-                userName:this.username,
-                password:this.password
-            }
-            this.$axios.post('http://localhost:10215/api/v1/user/login',data).then((res)=>{
-                console.log(res.data);
-                if(res.data.code === "A1000"){
-                    this.$message(res.data.message)
-                    return;
-                }
-                if(res.data.code === "00000"){
-                    this.$message({
-                        message: '登录成功',
-                        type: 'success'
-                    });
-                    window.sessionStorage.setItem('phone',this.username)
-                    window.sessionStorage.setItem('username',res.data.data.name)
-                    window.sessionStorage.setItem('token',res.data.data.token,)
-                    this.$router.push('/visual');
+const username = ref<string>('')
+const password = ref<string>('')
+const router = useRouter()
+const userStore = useUserStore()
 
-                }
-            })
-            
-        }
+const login = (): void => {
+    const data = {
+        userName: username.value,
+        password: password.value
     }
+    
+    axios.post('/api/v1/user/login', data).then((res: any) => {
+        console.log(res.data);
+        if(res.data.code === "A1000"){
+            ElMessage(res.data.message)
+            return;
+        }
+        if(res.data.code === "00000"){
+            ElMessage({
+                message: '登录成功',
+                type: 'success'
+            });
+            // 使用 Pinia store 存储用户信息
+            userStore.setUserInfo(username.value, res.data.data.name, res.data.data.token)
+            // 同步到 sessionStorage 以实现持久化
+            userStore.syncToSessionStorage()
+            router.push('/visual');
+        }
+    }).catch((error: any) => {
+        console.error('Login error:', error);
+    })
 }
 </script>
 

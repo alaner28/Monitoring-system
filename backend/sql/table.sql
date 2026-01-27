@@ -54,7 +54,7 @@ DROP TABLE IF EXISTS `case_type_info`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `case_type_info` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `case_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `case_type_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -76,7 +76,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `monitor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `monitor` (
+/*CREATE TABLE `monitor` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL,
   `area` varchar(20) DEFAULT NULL,
@@ -88,7 +88,29 @@ CREATE TABLE `monitor` (
   `flame` int DEFAULT NULL,
   `smoke` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;*/
+CREATE TABLE `monitor` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '监控点ID',
+  `name` varchar(50) NOT NULL COMMENT '监控名称',
+  `area` varchar(50) DEFAULT NULL COMMENT '所在区域',
+  `leader` varchar(30) DEFAULT NULL COMMENT '负责人',
+  `alarm_cnt` int DEFAULT 0 COMMENT '报警次数',
+  `stream_link` varchar(255) DEFAULT NULL COMMENT '视频流链接',
+  `latitude` double DEFAULT NULL COMMENT '纬度',
+  `longitude` double DEFAULT NULL COMMENT '经度',
+  `danger_area` tinyint(1) DEFAULT 0 COMMENT '是否危险区域',
+  `fall` tinyint(1) DEFAULT 0 COMMENT '是否检测摔倒',
+  `flame` tinyint(1) DEFAULT 0 COMMENT '是否检测明火',
+  `smoke` tinyint(1) DEFAULT 0 COMMENT '是否检测烟雾',
+  `wave` tinyint(1) DEFAULT 0 COMMENT '是否检测波浪',
+  `punch` tinyint(1) DEFAULT 0 COMMENT '是否检测击打',
+  `running` tinyint(1) DEFAULT 0 COMMENT '是否检测奔跑',
+  `left_x` int DEFAULT NULL COMMENT '左边界X坐标',
+  `left_y` int DEFAULT NULL COMMENT '左边界Y坐标',
+  `right_x` int DEFAULT NULL COMMENT '右边界X坐标',
+  `right_y` int DEFAULT NULL COMMENT '右边界Y坐标',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='监控设备表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +119,7 @@ CREATE TABLE `monitor` (
 
 LOCK TABLES `monitor` WRITE;
 /*!40000 ALTER TABLE `monitor` DISABLE KEYS */;
-INSERT INTO `monitor` VALUES (1,'1号病房摄像头','1号病房',1,1,1,1,1,1,1),(2,'医院大厅摄像头','医院大厅',1,1,1,1,1,1,1),(3,'海底捞摄像头','海底捞',1,1,1,1,1,1,1),(4,'正阳春摄像头','正阳春',1,1,1,1,1,1,1),(5,'115摄像头','115',1,1,1,1,1,1,1);
+/*INSERT INTO `monitor` VALUES (1,'1号病房摄像头','1号病房',1,1,1,1,1,1,1),(2,'医院大厅摄像头','医院大厅',1,1,1,1,1,1,1),(3,'海底捞摄像头','海底捞',1,1,1,1,1,1,1),(4,'正阳春摄像头','正阳春',1,1,1,1,1,1,1),(5,'115摄像头','115',1,1,1,1,1,1,1);*/
 /*!40000 ALTER TABLE `monitor` ENABLE KEYS */;
 UNLOCK TABLES;
 

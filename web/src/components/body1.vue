@@ -6,18 +6,10 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import barchart1 from './barchart1.vue';
 import piechart1 from './piechart1.vue';
 import alarmlist from './alarmlist.vue';
-    export default {
-        name:'body-1',
-        components:{
-            barchart1,
-            piechart1,
-            alarmlist
-        }
-    }
 </script>
 
 <style>

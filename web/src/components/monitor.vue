@@ -11,7 +11,7 @@
 
       <el-drawer
         title="监控列表"
-        :visible.sync="drawer"
+        v-model="drawer"
         :direction="direction"
         :before-close="handleClose">
         <div class="lists">
@@ -49,174 +49,207 @@
   </div>
   
 </template>
-
-<script>
+  
+<script setup lang="ts">
 // import videojs from 'video.js'; // 引入 video.js
 // import 'video.js/dist/video-js.css'; // 引入 video.js 样式
 // import 'videojs-flash'; // 引入 RTMP 支持
 import flvjs from 'flv.js';
 // import Hls from 'hls.js';
+import { ref, onMounted, onUnmounted, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+import { useAppStore } from '@/stores/app';
+import { ElMessage } from 'element-plus'
+import axios from 'axios';
+import { baseUrl } from '@/config/config';
 
-export default {
-  name: 'monitor-1',
-  data() {
-    return {
-      flvPlayer: null, // 更改为 flvPlayer
-      fontStyle: [
-        { color: '#06BFA1' },
-        { color: 'red' },
-      ],
-      drawer: false,
-      direction: 'rtl',
-      monitorLists: [
-        {
-          name: '1号摄像头',
-          number: '001',
-          dapartment: '2号楼',
-          leader: '小警',
-          running: true,
-          video: 'http://your-flv-url1.flv', // 示例 FLV 地址
-        },
-        {
-          name: '2号摄像头',
-          number: '002',
-          dapartment: '3号楼',
-          leader: '小明',
-          running: true,
-          video: 'http://your-flv-url2.flv',
-        },
-        {
-          name: '3号摄像头',
-          number: '003',
-          dapartment: '大厅',
-          leader: '小红',
-          running: true,
-          video: 'http://your-flv-url3.flv',
-        },
-        {
-          name: '4号摄像头',
-          number: '004',
-          dapartment: '28号楼',
-          leader: '小白',
-          running: false,
-          video: null,
-        },
-      ],
-    };
-  },
-  
-  mounted() {
+// 定义监控项接口
+interface MonitorItem {
+  name: string;
+  number: string;
+  dapartment: string;
+  leader: string;
+  running: boolean;
+  video: string | null;
+}
 
-    this.getVideoData();
+const flvPlayer = ref<any>(null); // 更改为 flvPlayer
+const drawer = ref<boolean>(false);
+const direction = ref<string>('rtl');
+const monitorLists = ref<MonitorItem[]>([//示例数据，会被后端传来的数据覆盖
+  {
+    name: '1号摄像头',
+    number: '001',
+    dapartment: '2号楼',
+    leader: '小警',
+    running: true,
+    video: 'http://your-flv-url1.flv',
   },
-      
-  beforeDestroy() {
-    if (this.flvPlayer) {
-      this.flvPlayer.destroy(); // 销毁 flv.js 播放器实例
+  {
+    name: '2号摄像头',
+    number: '002',
+    dapartment: '3号楼',
+    leader: '小明',
+    running: true,
+    video: 'http://your-flv-url2.flv',
+  },
+  {
+    name: '3号摄像头',
+    number: '003',
+    dapartment: '大厅',
+    leader: '小红',
+    running: true,
+    video: 'http://your-flv-url3.flv',
+  },
+  {
+    name: '4号摄像头',
+    number: '004',
+    dapartment: '28号楼',
+    leader: '小白',
+    running: false,
+    video: null,
+  },
+]);
+
+const fontStyle = reactive<{color: string}[]>([
+  { color: '#06BFA1' },
+  { color: 'red' },
+]);
+
+const router = useRouter();
+
+const initializeVideoPlayer = (videoUrl: string): void => {
+  if (flvjs.isSupported()) {
+    const videoElement = document.querySelector('video'); // 获取视频元素
+    if(videoElement && flvPlayer.value) {
+      flvPlayer.value.destroy(); // 先销毁之前的播放器实例
+      flvPlayer.value = null; // 清空引用
     }
-  },
-  
-  methods: {
-    initializeVideoPlayer(videoUrl) {
-      console.log('videourl',videoUrl);
-      
-      if (flvjs.isSupported()) {
-        const videoElement = this.$refs.videoElement;
-        const flvPlayer = flvjs.createPlayer({
-          type: 'flv',
-          // url: 'assets/1ad2d92b-fdf1-41b4-a94e-d71ad4395cb9.flv'
-          // url:videoUrl
-          //url: 'https://citydefender-1326073552.cos.ap-beijing.myqcloud.com/1ad2d92b-fdf1-41b4-a94e-d71ad4395cb9.flv'
-          url:'http://play2.city-guardian.top/live/test.flv?auth_key=2593435398-0-0-ef66e48403f3fa546987f347f72f0b7a'
-        });
-        flvPlayer.attachMediaElement(videoElement);
-        flvPlayer.load();
+    console.log('videourl', videoUrl);
+    //使用临时的001.flv，等物联网端接入后，再替换为动态的视频链接
+    try {
+      flvPlayer.value = flvjs.createPlayer({
+        type: 'flv',
+        url:  baseUrl + '/video/001.flv', //videoUrl 
+      }, {
+        enableWorker: false, // 禁用worker模式以减少复杂性
+        enableStashBuffer: false, // 减少缓冲区以提高稳定性
+        stashInitialSize: 128, // 设置初始缓冲区大小
+      });
+      if(videoElement) {
+        flvPlayer.value.attachMediaElement(videoElement);
+        flvPlayer.value.load();
         // 使用用户交互播放视频
         videoElement.addEventListener('click', () => {
-          flvPlayer.play().catch(error => {
-            console.log('Autoplay failed:', error);
+            const playPromise = flvPlayer.value.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+              playPromise.catch((error: any) => {
+                console.log('Autoplay failed:', error);
+              });
+            }
           });
-
+        
+        // 添加错误处理
+        flvPlayer.value.on(flvjs.Events.ERROR, (err: any) => {
+          console.error('FLV Player Error:', err);
         });
       }
-    },
-    getVideoData() {
-
-      // const video = 'http://play1.city-guardian.top/live/test.flv?auth_key=1728140343-0-0-4233a23962cf2a9e8eb3fd7d5b36ac2f'
-      // this.initializeVideoPlayer(video);
-
-
-      const token = window.sessionStorage.getItem('token');
-      this.$axios({
-        method: 'GET',
-        url: 'http://8.152.219.117:10215/api/v1/monitor',
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then((response) => {
-        if (response.data.code === 'D0400') {
-          this.$message({
-            message: 'token过期，请重新登录',
-            type: 'warning',
-          });
-          this.$router.push('/login');
-        } else {
-          console.log('获取监控列表成功', response);
-          const data = response.data.data;
-          this.monitorLists = data; // 更新监控列表
-
-          let id = window.sessionStorage.getItem('monitorId') || 0;
-          id = parseInt(id);
-          
-          // 在这里调用初始化视频播放器，将数据传递进去
-          if (data[id].video) {
-          console.log('video',data[id].video);
-          
-            this.initializeVideoPlayer(data[id].video);
-          }
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching video data:', error);
-      });
-    },
-
-
-    handleClose(done) {
-      // 在关闭抽屉之前，暂停视频
-      if (this.flvPlayer) {
-        this.flvPlayer.pause(); // 暂停视频
-      }
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done();
-          console.log(_);
-          
-        })
-        .catch(_ => {
-          console.log(_);
-        });
-    },
-
-    checkmonitor(index) {
-      const selectedVideoUrl = this.monitorLists[index].video;
-      window.sessionStorage.setItem('monitorId', index);
-
-      // 调用播放视频的函数
-      this.playFlvVideo(selectedVideoUrl);
-      // 关闭 el-drawer
-      this.drawer = false;
-    },
-
-    playFlvVideo(videoUrl) {
-      if (videoUrl) {
-        this.initializeVideoPlayer(videoUrl); // 调用初始化播放器方法
-      }
-    },
-  },
+    } catch (error) {
+      console.error('Failed to initialize FLV player:', error);
+    }
+  }
 };
 
+const getVideoData = (): void => {
+  // const video = 'http://play1.city-guardian.top/live/test.flv?auth_key=1728140343-0-0-4233a23962cf2a9e8eb3fd7d5b36ac2f'
+  // initializeVideoPlayer(video);
+
+  const userStore = useUserStore();
+  const appStore = useAppStore();
+  // 从 sessionStorage 恢复 monitorId 状态
+  appStore.hydrateFromSessionStorage();
+  
+  const token = userStore.token;
+  
+  
+  axios.get('/api/v1/monitor', {
+    headers: {
+      Authorization: token,
+    },
+  }).then((response: any) => {
+    if (response.data.code === 'D0400') {
+      ElMessage({
+        message: 'token过期，请重新登录',
+        type: 'warning',
+      });   
+      router.push('/login');
+    } else {
+      console.log('获取监控列表成功', response);
+      const data = response.data.data;
+      monitorLists.value = data; // 更新监控列表
+
+      const id = appStore.getMonitorId;
+      
+      // 在这里调用初始化视频播放器，将数据传递进去
+      if (data[id]?.video) {
+        console.log('video',data[id].video);
+        initializeVideoPlayer(data[id].video);
+      }
+    }
+  })
+  .catch((error: any) => {
+    console.error('Error fetching video data:', error);
+  });
+};
+
+const handleClose = (done: (() => void) | undefined): void => {
+  // 在关闭抽屉之前，暂停视频
+  if (flvPlayer.value) {
+    flvPlayer.value.pause(); // 暂停视频
+  }
+  
+  // 检查是否有未保存的更改需要确认，如果没有则直接关闭
+  // 这里简化处理，直接关闭而不询问
+  if (done) {
+    done();
+  } else {
+    // 如果没有传入done函数（例如直接调用），则手动设置drawer为false
+    drawer.value = false;
+  }
+};
+
+const checkmonitor = (index: number): void => {
+  const selectedVideoUrl = monitorLists.value[index].video;
+  const appStore = useAppStore();
+  // 使用 Pinia store 设置 monitorId
+  appStore.setMonitorId(index);
+
+  // 调用播放视频的函数
+  playFlvVideo(selectedVideoUrl);
+  // 关闭 el-drawer
+  drawer.value = false;
+};
+
+const playFlvVideo = (videoUrl: string | null): void => {
+  if (videoUrl) {
+    initializeVideoPlayer(videoUrl); // 调用初始化播放器方法
+  } else {
+    console.warn('No video URL provided, cannot play video');
+  }
+};
+
+onMounted(() => {
+  getVideoData();
+});
+
+onUnmounted(() => {
+  if (flvPlayer.value) {
+    flvPlayer.value.unload(); // 卸载媒体资源
+    flvPlayer.value.destroy(); // 销毁 flv.js 播放器实例
+    flvPlayer.value = null; // 清空引用
+  }
+});
 </script>
 
 <style scoped>

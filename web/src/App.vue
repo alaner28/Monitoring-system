@@ -4,18 +4,15 @@
   </div>
 </template>
 
-<script>
-  // import visual from './pages/visual.vue';
-  export default {
-    name: 'App',
-    data() {
-      return {
-        showdetail:false
-      }
-    },
-    mounted(){
-    }
-  }
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+// 如果不需要showdetail，可以删除它；或者如果需要但暂时未使用，可以加上注释
+const showdetail = ref<boolean>(false)
+
+onMounted(() => {
+  // 组件挂载后执行的逻辑
+})
 </script>
 
 <style>

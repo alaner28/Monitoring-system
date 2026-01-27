@@ -1,0 +1,44 @@
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+// import 'lib-flexible/flexible.js'
+import './flexible'
+import axios from 'axios'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import { createPinia } from 'pinia'
+
+
+// 创建应用实例
+const app = createApp(App)
+
+// 配置全局属性
+app.config.globalProperties.$axios = axios
+app.config.globalProperties.$bus = app
+
+// 设置axios默认baseURL
+// axios.defaults.baseURL = 'http://123.57.77.71:10215'
+// axios.defaults.baseURL = 'http://8.152.219.117:8001'
+axios.defaults.baseURL = 'http://localhost:10215';
+// axios.defaults.baseURL = '';
+
+// 创建并使用 pinia
+const pinia = createPinia()
+
+// 注册Element Plus、路由和pinia
+app.use(ElementPlus)
+app.use(router)
+app.use(pinia)
+
+// 页面加载后从 sessionStorage 恢复状态
+app.mount('#app').$nextTick(() => {
+  // 恢复用户信息
+  const { useUserStore } = require('@/stores/user')
+  const userStore = useUserStore()
+  userStore.hydrateFromSessionStorage()
+  
+  // 恢复应用信息
+  const { useAppStore } = require('@/stores/app')
+  const appStore = useAppStore()
+  appStore.hydrateFromSessionStorage()
+})

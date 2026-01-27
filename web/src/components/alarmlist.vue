@@ -8,7 +8,7 @@
             @click="showDetail(item)">
                 <div class="itemlist">
                     <h3>{{ index + 1 }} {{ item.eventName }} -- {{ item.department }}</h3>
-                    <img :src=" item.checked ? require('../../public/assets/checked.png') : require('../../public/assets/unchecked.png')" alt="">
+                    <img :src="item.deal === '已处理' ? require('../../public/assets/checked.png') : require('../../public/assets/unchecked.png')" alt="">
                 </div>
             </div>
         </div>
@@ -18,135 +18,146 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import dialog1 from './dialog1.vue';
-export default {
-    name: 'alarmlist-1',
-    components:{
-        dialog1
+import axios from 'axios';
+import { useAlarmStore } from '@/stores/alarm';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+import { baseUrl } from '@/config/config';
+// 无需重新定义AlarmItem接口，使用store中定义的
+
+const alarmStore = useAlarmStore();
+const { getAlarmList } = storeToRefs(alarmStore);
+
+const dialogVisible1 = ref<boolean>(false);
+const item = ref<any>('');
+const alarmlist = computed(() => getAlarmList.value);
+const pageNum = ref<number>(1);
+const pageSize = ref<number>(30);
+
+const itemlist1 = [
+    {
+        // 挥手
+        'backgroundColor': '#F1948A'
     },
-    data() {
-        return {
-            websocket: null,  // 用于存储 WebSocket 实例
-            dialogVisible1:false,
-            item:'',
-            alarmlist: [],  
-            itemlist1: [
-                {
-                    // 挥手
-                    'backgroundColor': '#F1948A'
-                },
-                {
-                    // 摔倒
-                    'backgroundColor': '#F8BD91'
-                },
-                {
-                    // 吸烟
-                    'backgroundColor': '#ffd9d9'
-                },
-                {
-                    // 进入危险区域
-                    'backgroundColor': '#7ABDD8'
-                },
-                {
-                    // 打拳
-                    'backgroundColor': '#F1948A'
-                },
-                {
-                    // 明火
-                    'backgroundColor': '#e7e3fe'
-                },
-                {
-                    // 区域停留
-                    'backgroundColor': '#2CD6DB'
-                },
-                {
-                    // 吸烟
-                    'backgroundColor': '#C4D83B'
-                },
-                {
-                    // 否则
-                    'backgroundColor': '#7ABDD8'
-                }
-            ],
-            pageNum:1,
-            pageSize:30
-        };
+    {
+        // 摔倒
+        'backgroundColor': '#F8BD91'
     },
-    methods: {
-        getcolor(type) {
-            if (type === '挥手') return 3;
-            else if (type === '摔倒') return 1;
-            else if (type === '烟雾') return 2;
-            else if (type === '进入危险区域') return 3;
-            else if (type === '打拳') return 4;
-            //明火
-            else if (type === '明火') return 5;
-            else if(type === '区域停留') return 6;
-            else if(type === '吸烟') return 7;
-            else return 8;
-        },
-
-        showDetail(item){
-            this.dialogVisible1 = true
-            console.log('item',item);
-            this.item = item
-            
-        },
-
-        handleDialogVisibility(res) {
-            this.dialogVisible1 = res;
-        },
-
-
-        // 获取报警列表
-        fetchAlarmList() {
-            const data = {
-                pageNum: this.pageNum,
-                pageSize: this.pageSize,
-                status: 0,
-            };
-            
-            this.$axios({
-                methos:'GET',
-                url:'http://8.152.219.117:10215/api/v1/alarm/query',
-                params:data
-
-                // url:'four/data',
-                
-            }).then(response => {
-                    // console.log('收到报警查询数据',response.data.data);
-                    
-                    const newAlarmList = response.data.data.alarmList;
-                    if (newAlarmList.length > 0 && JSON.stringify(newAlarmList) !== JSON.stringify(this.alarmlist)) {
-                        
-                        if(this.alarmlist.length > 0){
-                            this.$bus.$emit('alarm');  // 触发事件总线'alarm'事件
-                            this.$message({
-                                message: '您有一条报警新消息',
-                                type: 'warning'
-                            });
-                        } 
-                        this.alarmlist = newAlarmList;  // 更新报警列表
-                        
-                    }
-                 
-                })
-                .catch(error => {
-                    console.log('报警数据查询失败');
-                    
-                    console.log('Error fetching alarm list:', error);
-                });
-        }
+    {
+        // 吸烟
+        'backgroundColor': '#ffd9d9'
     },
-    mounted() {
-        this.fetchAlarmList();  // 初始获取报警列表
-        
-        setInterval(() => {
-            this.fetchAlarmList();  // 每秒更新报警列表
-        }, 1000);
+    {
+        // 进入危险区域
+        'backgroundColor': '#7ABDD8'
     },
+    {
+        // 打拳
+        'backgroundColor': '#F1948A'
+    },
+    {
+        // 明火
+        'backgroundColor': '#e7e3fe'
+    },
+    {
+        // 区域停留
+        'backgroundColor': '#2CD6DB'
+    },
+    {
+        // 吸烟
+        'backgroundColor': '#C4D83B'
+    },
+    {
+        // 否则
+        'backgroundColor': '#7ABDD8'
+    }
+];
+
+const getcolor = (type: string): number => {
+    if (type === '摔倒') return 1;
+    else if (type === '烟雾') return 2;
+    else if (type === '进入危险区域') return 3;
+    //明火
+    else if (type === '明火') return 5;
+    else if(type === '区域停留') return 6;
+    else if(type === '吸烟') return 7;
+    else return 8;
 };
+
+const showDetail = (itemData: any): void => {
+    dialogVisible1.value = true;
+    console.log('item', itemData);
+    console.log("由于物联网端还未接入，为了调试，前端固定设置这个视频链接");
+    itemData.video = baseUrl + '/video/001.flv';//暂定为后端路径
+    item.value = itemData;
+};
+
+const handleDialogVisibility = (res: boolean): void => {
+    dialogVisible1.value = res;
+};
+
+// 获取报警列表
+const fetchAlarmList = (): void => {
+    const data = {
+        pageNum: pageNum.value,
+        pageSize: pageSize.value,
+        status: 0,
+    };
+    
+    axios.get('/api/v1/alarm/query', {params: data})
+        .then((response: any) => {
+            // console.log('收到报警查询数据',response.data.data);
+            console.log('response:', response);
+            const newAlarmList = response.data.data.alarmList;
+            console.log('newAlarmList', newAlarmList);
+            if (newAlarmList.length > 0) {
+                // 将数据存储到Pinia中
+                alarmStore.setAlarmList(newAlarmList);
+                
+                // 根据报警列表更新统计数据
+                alarmStore.updateStatisticsFromAlarms();
+                
+                // 检查是否有新数据变化，如果有则触发报警事件
+                if(alarmStore.getAlarmList.length > 0){
+                    const bus = (window as any).$bus;
+                    if(bus) {
+                        bus.$emit('alarm');  // 触发事件总线'alarm'事件
+                    }
+                    
+                    ElMessage({
+                        message: '您有报警新消息',
+                        type: 'warning'
+                    });
+                } 
+            }
+        })
+        .catch((error: any) => {
+            console.log('报警数据查询失败');
+            
+            console.log('Error fetching alarm list:', error);
+        });
+};
+
+
+//let intervalId: number | null = null;
+
+onMounted(() => {
+    fetchAlarmList();  // 初始获取报警列表
+    //暂时只获取一次报警列表，后续这里改成websocket请求数据,目前定时器相关的都删了
+    /*intervalId = window.setInterval(() => {
+        fetchAlarmList();  // 每秒更新报警列表
+    }, 1000);*/
+});
+
+// 清理定时器
+onUnmounted(() => {
+    /*if(intervalId) {
+        clearInterval(intervalId);
+    }*/
+});
 </script>
 
 <style lang="less" scoped>

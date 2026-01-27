@@ -8,10 +8,10 @@
                     
                 </div>
                 <div class="digits">
-                    <div class="digit">{{ parseInt(realpeople/1000) }}</div>
-                    <div class="digit">{{ parseInt(realpeople/100%10) }}</div>
-                    <div class="digit">{{ parseInt(realpeople/10%10) }}</div>
-                    <div class="digit">{{ parseInt(realpeople%10) }}</div>
+                    <div class="digit">{{ Math.floor(realpeople/1000) }}</div>
+                    <div class="digit">{{ Math.floor((realpeople % 1000) / 100) }}</div>
+                    <div class="digit">{{ Math.floor((realpeople % 100) / 10) }}</div>
+                    <div class="digit">{{ realpeople % 10 }}</div>
                 </div>
             </div>
             <div class="daypeople">
@@ -21,10 +21,10 @@
                     
                 </div>
                 <div class="digits">
-                    <div class="digit">{{ parseInt(daypeople/1000) }}</div>
-                    <div class="digit">{{ parseInt(daypeople/100%10) }}</div>
-                    <div class="digit">{{ parseInt(daypeople/10%10) }}</div>
-                    <div class="digit">{{ parseInt(daypeople%10) }}</div>
+                    <div class="digit">{{ Math.floor(daypeople/1000) }}</div>
+                    <div class="digit">{{ Math.floor((daypeople % 1000) / 100) }}</div>
+                    <div class="digit">{{ Math.floor((daypeople % 100) / 10) }}</div>
+                    <div class="digit">{{ daypeople % 10 }}</div>
                 </div>
             </div>
         </div>
@@ -32,16 +32,11 @@
     </div>
 </template>
 
-<script>
-export default {
-    name:'people-1',
-    data() {
-        return {
-            realpeople:2,
-            daypeople:134
-        }
-    },
-}
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const realpeople = ref<number>(2)
+const daypeople = ref<number>(134)
 </script>
 
 <style lang="less" scoped>
